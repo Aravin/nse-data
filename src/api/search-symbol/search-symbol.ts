@@ -9,4 +9,4 @@ export const searchSymbol = async (searchKey: string): Promise<SymbolData> => {
   );
 };
 
-searchSymbol("HDFC");
+// searchSymbol("HDFC");

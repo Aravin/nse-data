@@ -8,4 +8,4 @@ export const marketStatus = async (): Promise<MarketState> => {
   );
 };
 
-marketStatus();
+// marketStatus();

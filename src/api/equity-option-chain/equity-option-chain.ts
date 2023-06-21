@@ -8,4 +8,4 @@ export const equityOptionChain = async (equityName: string): Promise<EquityOptio
   );
 };
 
-equityOptionChain("TCS");
+// equityOptionChain("TCS");

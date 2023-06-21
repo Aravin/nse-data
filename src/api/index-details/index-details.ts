@@ -8,4 +8,4 @@ export const indexDetails = async (): Promise<IndexDetails> => {
   );
 };
 
-indexDetails();
+// indexDetails();

@@ -8,4 +8,4 @@ export const indexOptionChain = async (indexName: string): Promise<IndexOptionCh
   );
 };
 
-indexOptionChain("NIFTY");
+// indexOptionChain("NIFTY");

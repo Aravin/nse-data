@@ -8,4 +8,4 @@ export const indexInfo = async (equityName: string): Promise<IndexInfo> => {
   );
 };
 
-indexInfo("NIFTY 50");
+// indexInfo("NIFTY 50");

@@ -8,5 +8,5 @@ export const equityHistory = async (equityName: string, startDate?: string, endD
   );
 };
 
-equityHistory("TCS");
-equityHistory("TCS", "14-06-2023", "21-06-2023");
+// equityHistory("TCS");
+// equityHistory("TCS", "14-06-2023", "21-06-2023");

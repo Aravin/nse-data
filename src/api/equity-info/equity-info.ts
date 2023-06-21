@@ -8,4 +8,4 @@ export const equityInfo = async (equityName: string): Promise<EquityInfo> => {
   );
 };
 
-equityInfo("HDFCBANK");
+// equityInfo("HDFCBANK");
