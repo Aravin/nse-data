@@ -1,13 +1,11 @@
-import axios from "axios";
 import { MarketState } from "./market-status.types";
 import { config } from "../../common/config";
+import { get } from "../../common/http";
 
 export const marketStatus = async (): Promise<MarketState> => {
-    const response = await axios.get(config.baseURL + config.endpoints.marketStatus);
-
-    console.log(response.data);
-
-    return response.data;
-}
+  return await get(
+    config.baseURL + config.endpoints.marketStatus
+  );
+};
 
 marketStatus();

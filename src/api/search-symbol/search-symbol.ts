@@ -1,13 +1,12 @@
 import axios from "axios";
 import { SymbolData } from "./search-symbol.types";
 import { config } from "../../common/config";
+import { get } from "../../common/http";
 
 export const searchSymbol = async (searchKey: string): Promise<SymbolData> => {
-    const response = await axios.get(config.baseURL + config.endpoints.searchSymbol + searchKey);
+  return await get(
+    config.baseURL + config.endpoints.searchSymbol + searchKey
+  );
+};
 
-    console.log(response.data);
-
-    return response.data;
-}
-
-searchSymbol('HDFC');
+searchSymbol("HDFC");
