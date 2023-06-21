@@ -9,6 +9,7 @@ export const config = {
     equityOptionChain: "/option-chain-equities?symbol=",
     indexOptionChain: "/option-chain-indices?symbol=",
     indexInfo: "/equity-stockIndices?index=",
-    indexList: "/allIndices",
+    indexList: "/index-names",
+    indexDetails: "/allIndices",
   },
 };
