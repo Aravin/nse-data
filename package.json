@@ -4,9 +4,10 @@
   "description": "NSE (National Stock Exchange) - Stock & Indices Data API - TypeScript | Node.js",
   "main": "dist/index.js",
   "dependencies": {
+  },
+  "devDependencies": {
     "typescript": "^5.1.3"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
