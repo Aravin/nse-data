@@ -8,6 +8,7 @@ export const config = {
     equityHistory: "/historical/cm/equity?series=[\"EQ\"]&symbol=",
     equityOptionChain: "/option-chain-equities?symbol=",
     indexOptionChain: "/option-chain-indices?symbol=",
-    indexInfo: "equity-stockIndices?index=",
+    indexInfo: "/equity-stockIndices?index=",
+    indexList: "/allIndices",
   },
 };
