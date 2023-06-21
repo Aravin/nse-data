@@ -1,6 +1,6 @@
 {
   "name": "nse-data",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "NSE (National Stock Exchange) - Stock & Indices Data API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
