@@ -1,4 +1,8 @@
 import axios from "axios";
+import axiosRetry from 'axios-retry';
+
+// Exponential back-off retry delay between requests
+axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
 export const get = async (url: string) => {
   try {
@@ -10,7 +14,7 @@ export const get = async (url: string) => {
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
-      console.log(error.response.data);
+      // console.log(error.response.data);
       console.log(error.response.status);
       console.log(error.response.headers);
     } else if (error.request) {
