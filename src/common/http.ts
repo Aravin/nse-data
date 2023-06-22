@@ -1,14 +1,20 @@
 import axios from "axios";
-import axiosRetry from 'axios-retry';
+import axiosRetry, { isNetworkOrIdempotentRequestError } from 'axios-retry';
 
 // Exponential back-off retry delay between requests
-axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
+axiosRetry(
+  axios,
+  {
+    retries: 3,
+    retryDelay: axiosRetry.exponentialDelay,
+    retryCondition: (error) => error.response?.status === 401 || isNetworkOrIdempotentRequestError(error),
+  }
+);
 
 export const get = async (url: string) => {
   try {
     const response = await axios.get(url);
 
-    console.log(response?.data);
     return response?.data;
   } catch (error: any) {
     if (error.response) {
@@ -27,5 +33,7 @@ export const get = async (url: string) => {
       console.log("Error", error.message);
     }
     console.log(error.config);
+
+    throw new Error('Error generating response, please retry!')
   }
 };

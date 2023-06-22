@@ -1,32 +1,47 @@
-# nse-data
+# nse-data - NSE (National Stock Exchange) - Stock &amp; Indices Data API
 
-NSE (National Stock Exchange) - Stock &amp; Indices Data API - TypeScript | Node.js
+This package will help to get realtime & historical data from NSE
+
+### Installation
 
 
-Add the `nse-data` to your project
+Install using 'npm'
 
+
+```shell
+npm install nse-data
 ```
+
+or
+
+Install using 'yarn'
+
+
+
+```shell
 yarn add nse-data
 ```
 
-Import the `nseData`
+### Usage
 
+#### Import the `nseData`
+
+
+```js
+import { nseData } from 'nse-data';
 ```
+
+#### API Call
+
+```js
 import { nseData } from 'nse-data';
 
+nseData.marketStatus().then((value) => console.log);
 ```
 
-API Call
+#### Sample Response
 
-```
-import { nseData } from 'nse-data';
-
-nseData.marketStatus().then((value) => console.log)
-```
-
-Response
-
-```
+```js
 {
   marketState: [
     {
@@ -86,3 +101,16 @@ Response
 }
 
 ```
+
+### All APIs
+
+1. marketStatus
+2. searchSymbol
+3. equityHistory
+4. equityInfo
+5. equityOptionChain
+6. equityQuote
+7. indexDetails
+8. indexInfo
+9. indexList
+10. indexOptionChain
