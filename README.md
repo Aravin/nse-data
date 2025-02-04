@@ -1,6 +1,51 @@
-# nse-data - NSE (National Stock Exchange) - Stock &amp; Indices Data API
+# NSE Data Project
 
-This package will help to get realtime & historical data from NSE
+## Overview
+This project provides a set of APIs to interact with the National Stock Exchange (NSE) data, allowing users to access various market and equity information.
+
+## Available APIs
+### Market APIs
+- **marketStatus**: Retrieve the current market status. [Source](./src/api/market-status/market-status.ts)  
+  - **Route URL**: `/marketStatus`  
+  - **HTTP Method**: GET  
+
+- **searchSymbol**: Search for a specific stock symbol. [Source](./src/api/search-symbol/search-symbol.ts)  
+  - **Route URL**: `/search/autocomplete?q=`  
+  - **HTTP Method**: GET  
+
+### Equity APIs
+- **equityHistory**: Get historical data for equities. [Source](./src/api/equity-history/equity-history.ts)  
+  - **Route URL**: `/historical/cm/equity?series=["EQ"]&symbol=`  
+  - **HTTP Method**: GET  
+
+- **equityInfo**: Retrieve detailed information about a specific equity. [Source](./src/api/equity-info/equity-info.ts)  
+  - **Route URL**: `/equity-meta-info?symbol=`  
+  - **HTTP Method**: GET  
+
+- **equityOptionChain**: Access the options chain for equities. [Source](./src/api/equity-option-chain/equity-option-chain.ts)  
+  - **Route URL**: `/option-chain-equities?symbol=`  
+  - **HTTP Method**: GET  
+
+- **equityQuote**: Get the latest quote for a specific equity. [Source](./src/api/equity-quote/equity-quote.ts)  
+  - **Route URL**: `/quote-equity?symbol=`  
+  - **HTTP Method**: GET  
+
+### Index APIs
+- **indexDetails**: Retrieve details about a specific index. [Source](./src/api/index-details/index-details.ts)  
+  - **Route URL**: `/allIndices`  
+  - **HTTP Method**: GET  
+
+- **indexInfo**: Get information about the index. [Source](./src/api/index-info/index-info.ts)  
+  - **Route URL**: `/equity-stockIndices?index=`  
+  - **HTTP Method**: GET  
+
+- **indexList**: Access a list of indices. [Source](./src/api/index-list/index-list.ts)  
+  - **Route URL**: `/index-names`  
+  - **HTTP Method**: GET  
+
+- **indexOptionChain**: Retrieve the options chain for indices. [Source](./src/api/index-option-chain/index-option-chain.ts)  
+  - **Route URL**: `/option-chain-indices?symbol=`  
+  - **HTTP Method**: GET  
 
 ### Installation
 
@@ -99,18 +144,3 @@ nseData.marketStatus().then((value) => console.log);
     }
   ]
 }
-
-```
-
-### All APIs
-
-1. marketStatus
-2. searchSymbol
-3. equityHistory
-4. equityInfo
-5. equityOptionChain
-6. equityQuote
-7. indexDetails
-8. indexInfo
-9. indexList
-10. indexOptionChain
