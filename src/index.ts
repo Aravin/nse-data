@@ -1,3 +1,1 @@
-import { nseDataApis } from "./api";
-
-export const nseData = nseDataApis;
+export { nseDataApis as nseData } from './api';

@@ -4,7 +4,7 @@ import { get } from "../../common/http";
 
 export const equityHistory = async (equityName: string, startDate?: string, endDate?: string): Promise<EquityHistory> => {
   return await get(
-    `${config.baseURL}${config.endpoints.equityHistory}${equityName}&from=${startDate || ''}&to=${endDate || ''}`
+    `${config.endpoints.equityHistory}${equityName}&from=${startDate || ''}&to=${endDate || ''}`
   );
 };
 

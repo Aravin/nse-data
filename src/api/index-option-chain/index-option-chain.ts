@@ -4,7 +4,7 @@ import { get } from "../../common/http";
 
 export const indexOptionChain = async (indexName: string): Promise<IndexOptionChain> => {
   return await get(
-    `${config.baseURL}${config.endpoints.indexOptionChain}${indexName}`
+    `${config.endpoints.indexOptionChain}${indexName}`
   );
 };
 

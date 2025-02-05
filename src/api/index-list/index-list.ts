@@ -3,9 +3,7 @@ import { config } from "../../common/config";
 import { get } from "../../common/http";
 
 export const indexList = async (): Promise<IndexList> => {
-  return await get(
-    config.baseURL + config.endpoints.indexList
-  );
+  return await get(config.endpoints.indexList);
 };
 
 // indexList();

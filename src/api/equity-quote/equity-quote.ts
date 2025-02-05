@@ -1,12 +1,7 @@
-import axios from "axios";
-import { EquityQuote } from "./equity-quote.types";
-import { config } from "../../common/config";
 import { get } from "../../common/http";
 
-export const equityQuote = async (equityName: string): Promise<EquityQuote> => {
-  return await get(
-    config.baseURL + config.endpoints.equityQuote + equityName
-  );
+export const equityQuote = async (symbol: string) => {
+  const url = `/equity-quote/${symbol}`;
+  return await get(url);
 };
-
 // equityQuote("HDFCBANK");

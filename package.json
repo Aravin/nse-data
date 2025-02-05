@@ -1,6 +1,6 @@
 {
   "name": "nse-data",
-  "version": "1.0.1",
+  "version": "2.0.0+2025001",
   "description": "NSE (National Stock Exchange) - Stock & Indices Data API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,10 +14,7 @@
     "version": "",
     "postversion": ""
   },
-  "dependencies": {
-    "axios": "^1.4.0",
-    "axios-retry": "^3.5.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "prettier": "2.8.8",
     "typescript": "^5.1.3"

@@ -1,39 +1,30 @@
-import axios from "axios";
-import axiosRetry, { isNetworkOrIdempotentRequestError } from 'axios-retry';
+import { config } from "../common/config";
 
-// Exponential back-off retry delay between requests
-axiosRetry(
-  axios,
-  {
-    retries: 3,
-    retryDelay: axiosRetry.exponentialDelay,
-    retryCondition: (error) => error.response?.status === 401 || isNetworkOrIdempotentRequestError(error),
-  }
-);
+const handleError = (error: any) => {
+  const message = error.response 
+    ? `Response error: ${error.response.status} - ${error.response.data}`
+    : error.request 
+    ? `Request error: ${error.request}`
+    : `Error: ${error.message}`;
 
-export const get = async (url: string) => {
+  console.error(message);
+  console.error("Config:", error.config);
+  console.error("Full error details:", JSON.stringify(error, null, 2)); // Log full error details
+  throw new Error('Error generating response, please retry!');
+};
+
+export const get = async (url: string): Promise<any> => {
   try {
-    const response = await axios.get(url);
+    const response = await fetch(`${config.baseURL || "https://www.nseindia.com/api"}${url}`, {
+      method: 'GET',
+    });
 
-    return response?.data;
-  } catch (error: any) {
-    if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      // console.log(error.response.data);
-      console.log(error.response.status);
-      console.log(error.response.headers);
-    } else if (error.request) {
-      // The request was made but no response was received
-      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-      // http.ClientRequest in node.js
-      console.log(error.request);
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      console.log("Error", error.message);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-    console.log(error.config);
 
-    throw new Error('Error generating response, please retry!')
+    return await response.json(); // Assuming the response is JSON
+  } catch (error) {
+    handleError(error);
   }
 };

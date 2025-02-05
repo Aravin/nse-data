@@ -69,78 +69,149 @@ yarn add nse-data
 
 ### Usage
 
-#### Import the `nseData`
+## Sample Code
 
+```javascript
+// ES5 Syntax using var and function declaration
+const nseDataES5 = require('nse-data');
 
-```js
-import { nseData } from 'nse-data';
-```
+function fetchMarketStatusES5() {
+    // Access marketStatus correctly through nseData
+    nseDataES5.nseData.marketStatus(function(err, status) {
+        if (err) {
+            console.error('Error fetching market status (ES5):', err);
+        } else {
+            console.log('Market Status (ES5):', status);
+        }
+    });
+}
 
-#### API Call
+fetchMarketStatusES5();
 
-```js
-import { nseData } from 'nse-data';
+// CommonJS Syntax using require
+const nseDataCJS = require('nse-data');
 
-nseData.marketStatus().then((value) => console.log);
-```
+const fetchMarketStatusCJS = () => {
+    nseDataCJS.nseData.marketStatus().then(status => {
+        console.log('Market Status (CJS):', status);
+    }).catch(err => {
+        console.error('Error fetching market status (CJS):', err);
+    });
+};
 
-#### Sample Response
+fetchMarketStatusCJS();
 
-```js
-{
-  marketState: [
-    {
-      market: 'Capital Market',
-      marketStatus: 'Closed',
-      tradeDate: '21-Jun-2023',
-      index: 'NIFTY 50',
-      last: 18856.85,
-      variation: 40.14999999999782,
-      percentChange: 0.21,
-      marketStatusMessage: 'Normal Market has Closed'
-    },
-    {
-      market: 'Currency',
-      marketStatus: 'Closed',
-      tradeDate: '21-Jun-2023',
-      index: '',
-      last: '',
-      variation: '',
-      percentChange: '',
-      marketStatusMessage: 'Market is Closed'
-    },
-    {
-      market: 'Commodity',
-      marketStatus: 'Closed',
-      tradeDate: '21-Jun-2023',
-      index: '',
-      last: '',
-      variation: '',
-      percentChange: '',
-      marketStatusMessage: 'Market is Closed'
-    },
-    {
-      market: 'Debt',
-      marketStatus: 'Closed',
-      tradeDate: '21-Jun-2023',
-      index: '',
-      last: '',
-      variation: '',
-      percentChange: '',
-      marketStatusMessage: 'Market is Closed'
-    },
-    {
-      market: 'currencyfuture',
-      marketStatus: 'Closed',
-      tradeDate: '21-Jun-2023',
-      index: '',
-      last: '82.0150',
-      variation: '',
-      percentChange: '',
-      marketStatusMessage: 'Market is Closed',
-      expiryDate: '23-Jun-2023',
-      underlying: 'USDINR',
-      tradeDateFormatted: '21-Jun-2023'
+// Anonymous Function using IIFE
+(async () => {
+    try {
+        const status = await nseDataCJS.nseData.marketStatus();
+        console.log('Market Status (Anonymous Function):', status);
+    } catch (error) {
+        console.error('Error fetching market status (Anonymous Function):', error);
     }
-  ]
+})();
+
+// Top-Level Await (ES Module Context)
+// Note: This will only work if the file is treated as an ES Module
+import {nseData} from 'nse-data';
+const status = await nseData.marketStatus();
+console.log('Market Status (Top-Level Await):', status);
+```
+
+## Sample Output
+
+```json
+{
+  "marketState": [
+    {
+      "market": "Capital Market",
+      "marketStatus": "Closed",
+      "tradeDate": "04-Feb-2025 15:30",
+      "index": "NIFTY 50",
+      "last": 23739.25,
+      "variation": 378.2000000000007,
+      "percentChange": 1.62,
+      "marketStatusMessage": "Normal Market has Closed"
+    },
+    {
+      "market": "Currency",
+      "marketStatus": "Closed",
+      "tradeDate": "04-Feb-2025",
+      "index": "",
+      "last": "",
+      "variation": "",
+      "percentChange": "",
+      "marketStatusMessage": "Market is Closed"
+    },
+    {
+      "market": "Commodity",
+      "marketStatus": "Open",
+      "tradeDate": "04-Feb-2025",
+      "index": "",
+      "last": "",
+      "variation": "",
+      "percentChange": "",
+      "marketStatusMessage": "Market is Open"
+    },
+    {
+      "market": "Debt",
+      "marketStatus": "Closed",
+      "tradeDate": "04-Feb-2025",
+      "index": "",
+      "last": "",
+      "variation": "",
+      "percentChange": "",
+      "marketStatusMessage": "Market is Closed"
+    },
+    {
+      "market": "currencyfuture",
+      "marketStatus": "Closed",
+      "tradeDate": "04-Feb-2025",
+      "index": "",
+      "last": "87.2475",
+      "variation": "",
+      "percentChange": "",
+      "marketStatusMessage": "Market is Closed",
+      "expiryDate": "25-Feb-2025",
+      "underlying": "USDINR",
+      "updated_time": "04-Feb-2025 17:00",
+      "tradeDateFormatted": "04-Feb-2025 17:00",
+      "slickclass": "slick-item"
+    }
+  ],
+  "marketcap": {
+    "timeStamp": "04-Feb-2025",
+    "marketCapinTRDollars": 4.85,
+    "marketCapinLACCRRupees": 422.59145349194324,
+    "marketCapinCRRupees": 42259145.35,
+    "marketCapinCRRupeesFormatted": "42,259,145.35",
+    "marketCapinLACCRRupeesFormatted": "422.59",
+    "underlying": "Market Cap"
+  },
+  "indicativenifty50": {
+    "dateTime": "04-Feb-2025 15:30",
+    "indicativeTime": null,
+    "indexName": "NIFTY 50",
+    "indexLast": null,
+    "indexPercChange": null,
+    "indexTimeVal": null,
+    "closingValue": 23739.25,
+    "finalClosingValue": 23739.25,
+    "change": 378.16,
+    "perChange": 1.62,
+    "status": "CLOSE"
+  },
+  "giftnifty": {
+    "INSTRUMENTTYPE": "FUTIDX",
+    "SYMBOL": "NIFTY",
+    "EXPIRYDATE": "27-Feb-2025",
+    "OPTIONTYPE": "-",
+    "STRIKEPRICE": "-",
+    "LASTPRICE": 23781,
+    "DAYCHANGE": "8.50",
+    "PERCHANGE": "            0.04",
+    "CONTRACTSTRADED": 73138,
+    "TIMESTMP": "04-Feb-2025 19:43",
+    "id": "4/NIFTYFUTIDX27-Feb-2025--"
+  }
 }
