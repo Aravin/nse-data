@@ -20,7 +20,7 @@ export interface Info {
   companyName: string;
   industry: string;
   activeSeries: string[];
-  debtSeries: any[];
+  debtSeries: unknown[];
   tempSuspendedSeries: string[];
   isFNOSec: boolean;
   isCASec: boolean;

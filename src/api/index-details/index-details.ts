@@ -3,7 +3,7 @@ import { config } from "../../common/config";
 import { get } from "../../common/http";
 
 export const indexDetails = async (): Promise<IndexDetails> => {
-  return await get(config.endpoints.indexDetails);
+  return get<IndexDetails>(config.endpoints.indexDetails);
 };
 
 // indexDetails();

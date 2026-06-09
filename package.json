@@ -5,19 +5,35 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "format": "yarn prettier --write src/**/*.ts",
-    "lint": "tslint -c tslint.json 'src/**/*.ts'",
-    "prepare": "",
-    "prepublish": "",
-    "perversion": "",
-    "version": "",
-    "postversion": ""
+    "build": "tsc",
+    "test": "jest --runInBand --forceExit",
+    "test:e2e": "jest --testPathPatterns=e2e --runInBand --forceExit",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{json,md,mjs}\"",
+    "lint": "eslint . && tsc --noEmit",
+    "lint:fix": "eslint . --fix && npm run format",
+    "prepare": "husky",
+    "prepack": "npm run build"
   },
-  "dependencies": {},
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,mjs}": [
+      "prettier --write"
+    ]
+  },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/jest": "^30.0.0",
+    "eslint": "^10.4.1",
+    "husky": "^9.1.7",
+    "jest": "^30.4.2",
+    "lint-staged": "^16.4.0",
     "prettier": "2.8.8",
-    "typescript": "^5.1.3"
+    "ts-jest": "^29.4.11",
+    "typescript": "^5.1.3",
+    "typescript-eslint": "^8.61.0"
   },
   "repository": {
     "type": "git",
