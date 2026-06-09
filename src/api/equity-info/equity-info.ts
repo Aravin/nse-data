@@ -5,7 +5,7 @@ import { get } from "../../common/http";
 
 const buildFallbackEquityInfo = (
   equityName: string,
-  result?: SmartSearchEquityResult,
+  result?: SmartSearchEquityResult
 ): EquityInfo => ({
   symbol: result?.symbol ?? equityName,
   companyName: result?.companyName ?? equityName,
@@ -26,14 +26,20 @@ const buildFallbackEquityInfo = (
 export const equityInfo = async (equityName: string): Promise<EquityInfo> => {
   try {
     return await get<EquityInfo>(
-      config.endpoints.equityInfo + encodeURIComponent(equityName),
+      config.endpoints.equityInfo + encodeURIComponent(equityName)
     );
   } catch {
     const results = await get<SmartSearchEquityResult[]>(
-      config.endpoints.searchSymbol + encodeURIComponent(equityName),
+      config.endpoints.searchSymbol + encodeURIComponent(equityName)
     );
 
-    return buildFallbackEquityInfo(equityName, results[0]);
+    const normalizedEquityName = equityName.trim().toUpperCase();
+    const fallbackResult =
+      results.find(
+        (result) => result.symbol.trim().toUpperCase() === normalizedEquityName
+      ) ?? results[0];
+
+    return buildFallbackEquityInfo(equityName, fallbackResult);
   }
 };
 

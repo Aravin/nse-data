@@ -7,20 +7,28 @@ interface ContractInfoResponse {
   strikePrice: string[];
 }
 
-export const indexOptionChain = async (indexName: string): Promise<IndexOptionChain> => {
+export const indexOptionChain = async (
+  indexName: string
+): Promise<IndexOptionChain> => {
   const contractInfo = await get<ContractInfoResponse>(
-    config.endpoints.indexOptionChain + encodeURIComponent(indexName),
+    config.endpoints.indexOptionChain + encodeURIComponent(indexName)
   );
+  const expiryDates = Array.isArray(contractInfo.expiryDates)
+    ? contractInfo.expiryDates
+    : [];
+  const strikePrices = Array.isArray(contractInfo.strikePrice)
+    ? contractInfo.strikePrice
+        .map((value) => Number(value))
+        .filter((value) => Number.isFinite(value))
+    : [];
 
   return {
     records: {
-      expiryDates: contractInfo.expiryDates,
+      expiryDates,
       data: [],
       timestamp: new Date().toISOString(),
       underlyingValue: 0,
-      strikePrices: contractInfo.strikePrice
-        .map((value) => Number(value))
-        .filter((value) => Number.isFinite(value)),
+      strikePrices,
     },
     filtered: {
       data: [],

@@ -6,7 +6,7 @@ export class NseApiError extends Error {
   constructor(
     public readonly status: number,
     public readonly endpoint: string,
-    message?: string,
+    message?: string
   ) {
     super(message ?? `NSE API responded with ${status} for ${endpoint}`);
     this.name = "NseApiError";
@@ -39,6 +39,8 @@ const API_HEADERS: Record<string, string> = {
   "Sec-Fetch-Dest": "empty",
 };
 
+const REQUEST_TIMEOUT_MS = 15_000;
+
 // ─── Cookie helpers ───────────────────────────────────────────────────────────
 
 type HeadersExt = Headers & { getSetCookie?: () => string[] };
@@ -63,6 +65,43 @@ function mergeCookies(...parts: string[]): string {
   return [...map.entries()].map(([k, v]) => `${k}=${v}`).join("; ");
 }
 
+function createTimeoutSignal(timeoutMs: number): {
+  controller: AbortController;
+  cleanup: () => void;
+} {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  return {
+    controller,
+    cleanup: () => clearTimeout(timeoutId),
+  };
+}
+
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit,
+  timeoutMs = REQUEST_TIMEOUT_MS
+): Promise<Response> {
+  const { controller, cleanup } = createTimeoutSignal(timeoutMs);
+
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new NseApiError(408, url, `Request timed out after ${timeoutMs}ms`);
+    }
+
+    throw error;
+  } finally {
+    cleanup();
+  }
+}
+
+async function discardResponse(response: Response): Promise<void> {
+  await response.body?.cancel();
+}
+
 // ─── Manual redirect follower ─────────────────────────────────────────────────
 // Node.js `fetch` with `redirect: "follow"` only exposes Set-Cookie from the
 // FINAL response. Akamai and NSE set critical validation cookies on intermediate
@@ -70,7 +109,7 @@ function mergeCookies(...parts: string[]): string {
 
 async function fetchCollectingCookies(
   startUrl: string,
-  headers: Record<string, string>,
+  headers: Record<string, string>
 ): Promise<string> {
   const cookieMap = new Map<string, string>();
   let url = startUrl;
@@ -80,27 +119,34 @@ async function fetchCollectingCookies(
       .map(([k, v]) => `${k}=${v}`)
       .join("; ");
 
-    const res = await fetch(url, {
+    const res = await fetchWithTimeout(url, {
       method: "GET",
-      headers: { ...headers, ...(currentCookies ? { Cookie: currentCookies } : {}) },
+      headers: {
+        ...headers,
+        ...(currentCookies ? { Cookie: currentCookies } : {}),
+      },
       redirect: "manual",
     });
 
-    // Accumulate Set-Cookie from this hop
-    for (const raw of extractSetCookies(res.headers)) {
-      const kv = raw.split(";")[0].trim();
-      const eq = kv.indexOf("=");
-      if (eq !== -1) cookieMap.set(kv.slice(0, eq), kv.slice(eq + 1));
-    }
+    try {
+      // Accumulate Set-Cookie from this hop
+      for (const raw of extractSetCookies(res.headers)) {
+        const kv = raw.split(";")[0].trim();
+        const eq = kv.indexOf("=");
+        if (eq !== -1) cookieMap.set(kv.slice(0, eq), kv.slice(eq + 1));
+      }
 
-    if (res.status >= 300 && res.status < 400) {
-      const loc = res.headers.get("location") ?? "";
-      if (!loc) break;
-      url = loc.startsWith("http") ? loc : new URL(loc, url).href;
-      continue;
-    }
+      if (res.status >= 300 && res.status < 400) {
+        const loc = res.headers.get("location") ?? "";
+        if (!loc) break;
+        url = loc.startsWith("http") ? loc : new URL(loc, url).href;
+        continue;
+      }
 
-    break; // non-redirect: done
+      break; // non-redirect: done
+    } finally {
+      await discardResponse(res);
+    }
   }
 
   return [...cookieMap.entries()].map(([k, v]) => `${k}=${v}`).join("; ");
@@ -119,13 +165,17 @@ async function refreshSession(): Promise<void> {
   // Step 1: homepage (follow all redirect hops to collect every cookie)
   const homeCookies = await fetchCollectingCookies(
     "https://www.nseindia.com/",
-    HOME_HEADERS,
+    HOME_HEADERS
   );
 
   // Step 2: market-data page with homepage cookies
   const warmCookies = await fetchCollectingCookies(
     "https://www.nseindia.com/market-data/live-equity-market",
-    { ...HOME_HEADERS, Referer: "https://www.nseindia.com/" },
+    {
+      ...HOME_HEADERS,
+      Referer: "https://www.nseindia.com/",
+      ...(homeCookies ? { Cookie: homeCookies } : {}),
+    }
   );
 
   session.cookies = mergeCookies(homeCookies, warmCookies);
@@ -152,59 +202,77 @@ export const get = async <T = unknown>(url: string): Promise<T> => {
   const fullUrl = `${config.baseURL}${url}`;
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    const res = await fetch(fullUrl, {
+    const res = await fetchWithTimeout(fullUrl, {
       method: "GET",
       headers: { ...API_HEADERS, Cookie: session.cookies },
     });
 
-    // Auth failures: refresh session and retry with back-off
-    if (res.status === 401 || res.status === 403) {
-      if (attempt < MAX_RETRIES - 1) {
+    try {
+      // Auth failures: refresh session and retry with back-off
+      if (res.status === 401 || res.status === 403) {
+        if (attempt < MAX_RETRIES - 1) {
+          await refreshSession();
+          await delay(1000 * (attempt + 1));
+          continue;
+        }
+        throw new NseApiError(
+          res.status,
+          fullUrl,
+          `Authentication failed after ${MAX_RETRIES} attempts`
+        );
+      }
+
+      // Transient server errors: back-off and retry
+      if (res.status === 429 || res.status === 503 || res.status === 502) {
+        if (attempt === MAX_RETRIES - 1) {
+          throw new NseApiError(
+            res.status,
+            fullUrl,
+            `Request failed with ${res.status} after ${MAX_RETRIES} attempts`
+          );
+        }
+
+        const retryAfterSec =
+          res.status === 429
+            ? Number(res.headers.get("retry-after") ?? "2")
+            : 2;
+        await delay(
+          (Number.isFinite(retryAfterSec) ? retryAfterSec : 2) * 1000
+        );
+        continue;
+      }
+
+      if (!res.ok) {
+        throw new NseApiError(res.status, fullUrl);
+      }
+
+      const data = (await res.json()) as T;
+
+      // NSE returns {} (empty object) on some endpoints when the session has
+      // expired. Treat as a soft auth failure and retry with a fresh session.
+      if (
+        data !== null &&
+        typeof data === "object" &&
+        !Array.isArray(data) &&
+        Object.keys(data as Record<string, unknown>).length === 0 &&
+        attempt < MAX_RETRIES - 1
+      ) {
         await refreshSession();
         await delay(1000 * (attempt + 1));
         continue;
       }
-      throw new NseApiError(
-        res.status,
-        fullUrl,
-        `Authentication failed after ${MAX_RETRIES} attempts`,
-      );
+
+      return data;
+    } finally {
+      if (res.body && !res.body.locked) {
+        await discardResponse(res);
+      }
     }
-
-    // Transient server errors: back-off and retry
-    if (res.status === 429 || res.status === 503 || res.status === 502) {
-      const retryAfterSec =
-        res.status === 429
-          ? Number(res.headers.get("retry-after") ?? "2")
-          : 2;
-      await delay(
-        (Number.isFinite(retryAfterSec) ? retryAfterSec : 2) * 1000,
-      );
-      continue;
-    }
-
-    if (!res.ok) {
-      throw new NseApiError(res.status, fullUrl);
-    }
-
-    const data = (await res.json()) as T;
-
-    // NSE returns {} (empty object) on some endpoints when the session has
-    // expired. Treat as a soft auth failure and retry with a fresh session.
-    if (
-      data !== null &&
-      typeof data === "object" &&
-      !Array.isArray(data) &&
-      Object.keys(data as Record<string, unknown>).length === 0 &&
-      attempt < MAX_RETRIES - 1
-    ) {
-      await refreshSession();
-      await delay(1000 * (attempt + 1));
-      continue;
-    }
-
-    return data;
   }
 
-  throw new NseApiError(0, fullUrl, `Request failed after ${MAX_RETRIES} attempts`);
+  throw new NseApiError(
+    0,
+    fullUrl,
+    `Request failed after ${MAX_RETRIES} attempts`
+  );
 };

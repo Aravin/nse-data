@@ -15,17 +15,19 @@ const toLegacySymbol = (entry: SmartSearchEquityResult): Symbol => ({
   symbol_suggest: [{ input: entry.companyName, weight: 1 }],
   result_type: ResultType.Symbol,
   result_sub_type: ResultSubType.Equity,
-  activeSeries: entry.series === ActiveSery.W1 ? [ActiveSery.W1] : [ActiveSery.Eq],
+  activeSeries:
+    entry.series === ActiveSery.W1 ? [ActiveSery.W1] : [ActiveSery.Eq],
   url: entry.url,
 });
 
 export const searchSymbol = async (symbol: string): Promise<SymbolData> => {
   const results = await get<SmartSearchEquityResult[]>(
-    config.endpoints.searchSymbol + encodeURIComponent(symbol),
+    config.endpoints.searchSymbol + encodeURIComponent(symbol)
   );
+  const symbols = Array.isArray(results) ? results.map(toLegacySymbol) : [];
 
   return {
-    symbols: results.map(toLegacySymbol),
+    symbols,
     mfsymbols: [],
     search_content: [],
     sitemap: [],

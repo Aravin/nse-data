@@ -1,13 +1,13 @@
 {
   "name": "nse-data",
-  "version": "2.0.0+2025001",
+  "version": "3.0.0+2026001",
   "description": "NSE (National Stock Exchange) - Stock & Indices Data API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest --runInBand --forceExit",
-    "test:e2e": "jest --testPathPatterns=e2e --runInBand --forceExit",
+    "test": "jest --detectOpenHandles --runInBand",
+    "test:e2e": "jest --testPathPatterns=e2e --runInBand",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{json,md,mjs}\"",
     "lint": "eslint . && tsc --noEmit",
     "lint:fix": "eslint . --fix && npm run format",
