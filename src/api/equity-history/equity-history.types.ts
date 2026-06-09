@@ -19,7 +19,7 @@ export interface Datum {
   CH_52WEEK_HIGH_PRICE:  number;
   CH_52WEEK_LOW_PRICE:   number;
   CH_TOTAL_TRADES:       number;
-  CH_ISIN:               String;
+  CH_ISIN:               string;
   CH_TIMESTAMP:          Date;
   TIMESTAMP:             Date;
   createdAt:             Date;

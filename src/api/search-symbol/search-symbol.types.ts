@@ -1,8 +1,20 @@
 export interface SymbolData {
   symbols: Symbol[];
-  mfsymbols: any[];
-  search_content: any[];
-  sitemap: any[];
+  mfsymbols: unknown[];
+  search_content: unknown[];
+  sitemap: unknown[];
+}
+
+export interface SmartSearchEquityResult {
+  symbol: string;
+  series: string;
+  companyName: string;
+  lastPrice: number;
+  change: number;
+  pChange: number;
+  segment: string;
+  url: string;
+  webUrl: string;
 }
 
 export interface Symbol {
