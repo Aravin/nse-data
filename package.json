@@ -4,6 +4,12 @@
   "description": "NSE (National Stock Exchange) - Stock & Indices Data API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "jest --detectOpenHandles --runInBand",
